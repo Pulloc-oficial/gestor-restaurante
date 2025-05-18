@@ -1,0 +1,26 @@
+{
+  "name": "gestor-restaurante",
+  "version": "1.0.0",
+  "description": "GIR gestor interno de restaurante",
+  "main": "modelos.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pulloc-oficial/gestor-restaurante.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Pulloc-oficial/gestor-restaurante/issues"
+  },
+  "homepage": "https://github.com/Pulloc-oficial/gestor-restaurante#readme",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "xlsx": "^0.18.5"
+  }
+}
