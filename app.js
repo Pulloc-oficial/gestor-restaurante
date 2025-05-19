@@ -30,6 +30,16 @@ app.get('/productos', (req, res) => {
   res.json(productos);
 });
 
+//ESCRIBIR-->Creacion de ruta para escribir el archivo excel de productos
+const jsonParser = bodyParser.json()
+app.post('/productos', jsonParser, function (req, res) {
+  const filePath = path.join(__dirname, './db/producto.xlsx');
+  
+  if (!req.body) res.sendStatus(400);
+  // create user in req.body
+  res.json(req.body);
+})
+
 // Iniciar el servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
