@@ -36,6 +36,26 @@ app.post('/productos', jsonParser, function (req, res) {
   const filePath = path.join(__dirname, './db/producto.xlsx');
   
   if (!req.body) res.sendStatus(400);
+  //leyendo la hoja de excel
+  //const workbook = xlsx.readFile(filePath);
+  //const sheetName = workbook.SheetNames[0];
+  //const worksheet = workbook.Sheets[sheetName];
+  //const range = xlsx.utils.decode_range(worksheet['!ref'] || 'A1');
+  //const lastRow = range.e.r;
+  //const data = [{
+    //"Uid": 2,
+   // "Name": "hamburguesa",
+    //"Image": "hamburguesa.jpg",
+  //  "Price": 25000,
+    //"Discount_price": 20000,
+  //  "IsActive": true,
+    //"Description": "hamburguesa 3carnes",
+  //  "Items":"[{\"Name\": \"Queso\", \"amount\": \"1\"}, {\"Name\": \"Jam\ón\", \"amount\": \"2\"}]"
+//}];
+  //const data = XLSX.utils.json_to_sheet(req.body);
+  //xlsx.utils.sheet_add_aoa(worksheet, data, { origin: -1 });
+  //xlsx.writeFile(workbook, filePath);
+
   // create user in req.body
   res.json(req.body);
 })
