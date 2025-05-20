@@ -23,8 +23,16 @@ type ItemProduct = {
     additional_information: string;
   };
   
+  type estado = {
+    creado: 0;
+    preparacion: 1;
+    listo: 2;
+    entregado: 3;
+    pagado: 4;
+  }
   // Modelo de grupo de órdenes
   type Orders = {
+    status: estado;
     Uid: string;
     table: string;
     Description_general: string;
