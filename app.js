@@ -31,33 +31,27 @@ app.get('/productos', (req, res) => {
 });
 
 //ESCRIBIR-->Creacion de ruta para escribir el archivo excel de productos
-const jsonParser = bodyParser.json()
-app.post('/productos', jsonParser, function (req, res) {
+app.post('/productos', (req, res) => {
+  const nuevoProducto = req.body;
   const filePath = path.join(__dirname, './db/producto.xlsx');
   
-  if (!req.body) res.sendStatus(400);
-  //leyendo la hoja de excel
-  //const workbook = xlsx.readFile(filePath);
-  //const sheetName = workbook.SheetNames[0];
-  //const worksheet = workbook.Sheets[sheetName];
-  //const range = xlsx.utils.decode_range(worksheet['!ref'] || 'A1');
-  //const lastRow = range.e.r;
-  //const data = [{
-    //"Uid": 2,
-   // "Name": "hamburguesa",
-    //"Image": "hamburguesa.jpg",
-  //  "Price": 25000,
-    //"Discount_price": 20000,
-  //  "IsActive": true,
-    //"Description": "hamburguesa 3carnes",
-  //  "Items":"[{\"Name\": \"Queso\", \"amount\": \"1\"}, {\"Name\": \"Jam\ón\", \"amount\": \"2\"}]"
-//}];
-  //const data = XLSX.utils.json_to_sheet(req.body);
-  //xlsx.utils.sheet_add_aoa(worksheet, data, { origin: -1 });
-  //xlsx.writeFile(workbook, filePath);
+  let productos = [];
 
-  // create user in req.body
-  res.json(req.body);
+  if (fs.existsSync(filePath)) {
+    const workbook = xlsx.readFile(filePath);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    productos = xlsx.utils.sheet_to_json(sheet);
+  }
+
+  productos.push(nuevoProducto);
+
+  const newWorkbook = xlsx.utils.book_new();
+  const newSheet = xlsx.utils.json_to_sheet(productos);
+  xlsx.utils.book_append_sheet(newWorkbook, newSheet, 'Productos');
+  xlsx.writeFile(newWorkbook, filePath);
+
+  res.json({ mensaje: 'Producto guardado correctamente', producto: nuevoProducto });
+
 })
 
 // Iniciar el servidor
