@@ -7,13 +7,14 @@ const cors = require('cors');
 const xlsx = require('xlsx');
 const fs = require('fs');
 const path = require('path');
+const checkApiKey = require('../../middlewares/checkApiKey');
     
 
 //fichero db producto.xlsx
 const filePath = path.join(__dirname, '../../db/orden.xlsx');
 
 //GET -> productos
-router.get('/', (req, res) => {
+router.get('/', checkApiKey, (req, res) => {
   if (!fs.existsSync(filePath)) {
     return res.status(404).json({ error: 'Archivo orden.xlsx no encontrado' });
   }
@@ -26,7 +27,7 @@ router.get('/', (req, res) => {
 });
 
 //POST -> productos
-router.post('/', (req, res) => {
+router.post('/', checkApiKey, (req, res) => {
   const nuevaOrden = req.body;
   let ordenes = [];
 

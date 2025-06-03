@@ -1,5 +1,8 @@
 // app.js
 
+// API-KEY
+const API_KEY = 'GIR2025';
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
