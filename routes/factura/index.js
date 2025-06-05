@@ -10,10 +10,10 @@ const path = require('path');
 const checkApiKey = require('../../middlewares/checkApiKey');
     
 
-//fichero db producto.xlsx
+//fichero db factura.xlsx
 const filePath = path.join(__dirname, '../../db/factura.xlsx');
 
-//GET -> productos
+//GET -> LEER TODAS LAS FACTURAS
 router.get('/', checkApiKey, (req, res) => {
   if (!fs.existsSync(filePath)) {
     return res.status(404).json({ error: 'Archivo factura.xlsx no encontrado' });
@@ -26,7 +26,24 @@ router.get('/', checkApiKey, (req, res) => {
   res.json(facturas);
 });
 
-//POST -> productos
+//GET -> LEER ID DE UNA FACTURA
+router.get('/:Uid', checkApiKey, (req, res) => {
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Archivo producto.xlsx no encontrado' });
+  }
+
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const productos = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  const item = productos.find(p => String(p.Uid) === String(req.params.Uid));
+  
+  if (!item) {
+    return res.status(404).json({ error: 'Producto no encontrado' });
+  }
+  res.json(item);
+});
+
+//POST -> AGREGAR UNA NUEVA FACTURA
 router.post('/', checkApiKey, (req, res) => {
   const nuevaFactura = req.body;
   let facturas = [];
@@ -47,6 +64,58 @@ router.post('/', checkApiKey, (req, res) => {
   res.status(201).json({ mensaje: 'factura guardada correctamente', factura: nuevaFactura });
 
 })
+
+//PUT -> ACTUALIZAR UN ELEMENTO
+router.delete('/:Uid', checkApiKey, (req, res) => {
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Archivo factura.xlsx no encontrado' });
+  }
+
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const facturas = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  const index = facturas.findIndex(p => String(p.Uid) === String(req.params.Uid));
+  
+  if (index === -1) {
+    return res.status(404).json({ error: 'factura no encontrado para eliminar' });
+  }
+
+  facturas[index] = { ...facturas[index], ...req.body };
+  
+  const newWorkbook = xlsx.utils.book_new();
+  const newSheet = xlsx.utils.json_to_sheet(facturas);
+  xlsx.utils.book_append_sheet(newWorkbook, newSheet, 'facturas');
+  xlsx.writeFile(newWorkbook, filePath);
+  
+  res.status(200).json({ mensaje: 'factura eliminada correctamente', Uid: req.params.Uid });
+
+});
+
+//DELETE -> ELIMINAR UN ELEMENTO
+router.delete('/:Uid', checkApiKey, (req, res) => {
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Archivo factura.xlsx no encontrado' });
+  }
+
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const facturas = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  const index = facturas.findIndex(p => String(p.Uid) === String(req.params.Uid));
+  
+  if (index === -1) {
+    return res.status(404).json({ error: 'factura no encontrado para eliminar' });
+  }
+
+  facturas.splice(index, 1);
+  
+  const newWorkbook = xlsx.utils.book_new();
+  const newSheet = xlsx.utils.json_to_sheet(facturas);
+  xlsx.utils.book_append_sheet(newWorkbook, newSheet, 'facturas');
+  xlsx.writeFile(newWorkbook, filePath);
+  
+  res.status(200).json({ mensaje: 'factura eliminada correctamente', Uid: req.params.Uid });
+
+});
 
 module.exports = router;
 

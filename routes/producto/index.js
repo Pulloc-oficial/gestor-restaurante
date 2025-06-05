@@ -8,12 +8,13 @@ const xlsx = require('xlsx');
 const fs = require('fs');
 const path = require('path');
 const checkApiKey = require('../../middlewares/checkApiKey');
+const { strictEqual } = require('assert');
     
 
 //fichero db producto.xlsx
 const filePath = path.join(__dirname, '../../db/producto.xlsx');
 
-//GET -> productos
+//GET -> LEER TODOS LOS PRODUCTOS
 router.get('/', checkApiKey, (req, res) => {
   if (!fs.existsSync(filePath)) {
     return res.status(404).json({ error: 'Archivo producto.xlsx no encontrado' });
@@ -26,7 +27,24 @@ router.get('/', checkApiKey, (req, res) => {
   res.json(productos);
 });
 
-//POST -> productos
+//GET -> LEER ID DE UN PRODUCTO
+router.get('/:Uid', checkApiKey, (req, res) => {
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Archivo producto.xlsx no encontrado' });
+  }
+
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const productos = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  const item = productos.find(p => String(p.Uid) === String(req.params.Uid));
+  
+  if (!item) {
+    return res.status(404).json({ error: 'Producto no encontrado' });
+  }
+  res.json(item);
+});
+
+//POST -> AGREGAR UN PRODUCTO
 router.post('/', checkApiKey, (req, res) => {
   const nuevoProducto = req.body;
   let productos = [];
@@ -47,6 +65,61 @@ router.post('/', checkApiKey, (req, res) => {
   res.status(201).json({ mensaje: 'Producto guardado correctamente', producto: nuevoProducto });
 
 })
+
+//PUT -> ACTUALIZAR UN PRODUCTO
+router.put('/:Uid', checkApiKey, (req, res) => {
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Archivo producto.xlsx no encontrado' });
+  }
+
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const productos = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  const index = productos.findIndex(p => String(p.Uid) === String(req.params.Uid));
+  
+  if (index === -1) {
+    return res.status(404).json({ error: 'Producto no encontrado para eliminar' });
+  }
+
+  productos[index] = { ...productos[index], ...req.body };
+
+  const newWorkbook = xlsx.utils.book_new();
+  const newSheet = xlsx.utils.json_to_sheet(productos);
+  xlsx.utils.book_append_sheet(newWorkbook, newSheet, 'Productos');
+  xlsx.writeFile(newWorkbook, filePath);
+  
+  res.status(200).json({ mensaje: 'Producto eliminado correctamente', Uid: req.params.Uid });
+
+});
+
+//DELETE -> ELIMINAR UN ELEMENTO
+router.delete('/:Uid', checkApiKey, (req, res) => {
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Archivo producto.xlsx no encontrado' });
+  }
+
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const productos = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  const index = productos.findIndex(p => String(p.Uid) === String(req.params.Uid));
+  
+  if (index === -1) {
+    return res.status(404).json({ error: 'Producto no encontrado para eliminar' });
+  }
+
+  productos.splice(index, 1);
+
+  const newWorkbook = xlsx.utils.book_new();
+  const newSheet = xlsx.utils.json_to_sheet(productos);
+  xlsx.utils.book_append_sheet(newWorkbook, newSheet, 'Productos');
+  xlsx.writeFile(newWorkbook, filePath);
+  
+  res.status(200).json({ mensaje: 'Producto eliminado correctamente', Uid: req.params.Uid });
+
+});
+
+
+
 
 module.exports = router;
 
