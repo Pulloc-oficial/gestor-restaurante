@@ -27,6 +27,24 @@ router.get('/', checkApiKey, (req, res) => {
   res.json(productos);
 });
 
+//GET -> OBTENER PAGINACION 25-Productos
+router.get('/paginado', checkApiKey, (req, res) => {
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Archivo producto.xlsx no encontrado' });
+  }
+ 
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const productos = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  const page = parseInt(req.query.page) || 1;
+ 
+  const start = (page - 1) * 25;
+  const end = start + 25;
+  const productosPagina = productos.slice(start, end);
+  
+  res.json(productosPagina);
+});
+
 //GET -> LEER ID DE UN PRODUCTO
 router.get('/:Uid', checkApiKey, (req, res) => {
   if (!fs.existsSync(filePath)) {
@@ -43,6 +61,8 @@ router.get('/:Uid', checkApiKey, (req, res) => {
   }
   res.json(item);
 });
+
+
 
 //POST -> AGREGAR UN PRODUCTO
 router.post('/', checkApiKey, (req, res) => {
