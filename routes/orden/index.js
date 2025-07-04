@@ -77,7 +77,7 @@ router.delete('/:Uid', checkApiKey, (req, res) => {
   const index = ordenes.findIndex(p => String(p.Uid) === String(req.params.Uid));
   
   if (index === -1) {
-    return res.status(404).json({ error: 'orden no encontrado para eliminar' });
+    return res.status(404).json({ error: 'orden no encontrado para actualizar' });
   }
 
   ordenes[index] = { ...ordenes[index], ...req.body };
@@ -87,7 +87,7 @@ router.delete('/:Uid', checkApiKey, (req, res) => {
   xlsx.utils.book_append_sheet(newWorkbook, newSheet, 'ordenes');
   xlsx.writeFile(newWorkbook, filePath);
   
-  res.status(200).json({ mensaje: 'orden eliminada correctamente', Uid: req.params.Uid });
+  res.status(200).json({ mensaje: 'orden actualizada correctamente', orden: ordenes[index] });
 
 });
 

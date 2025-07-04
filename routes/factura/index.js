@@ -77,7 +77,7 @@ router.delete('/:Uid', checkApiKey, (req, res) => {
   const index = facturas.findIndex(p => String(p.Uid) === String(req.params.Uid));
   
   if (index === -1) {
-    return res.status(404).json({ error: 'factura no encontrado para eliminar' });
+    return res.status(404).json({ error: 'factura no encontrado para actualizar' });
   }
 
   facturas[index] = { ...facturas[index], ...req.body };
@@ -87,7 +87,7 @@ router.delete('/:Uid', checkApiKey, (req, res) => {
   xlsx.utils.book_append_sheet(newWorkbook, newSheet, 'facturas');
   xlsx.writeFile(newWorkbook, filePath);
   
-  res.status(200).json({ mensaje: 'factura eliminada correctamente', Uid: req.params.Uid });
+  res.status(200).json({ mensaje: 'factura actualizada correctamente', factura: facturas[index] });
 
 });
 

@@ -98,7 +98,7 @@ router.put('/:Uid', checkApiKey, (req, res) => {
   const index = productos.findIndex(p => String(p.Uid) === String(req.params.Uid));
   
   if (index === -1) {
-    return res.status(404).json({ error: 'Producto no encontrado para eliminar' });
+    return res.status(404).json({ error: 'Producto no encontrado para actualizar' });
   }
 
   productos[index] = { ...productos[index], ...req.body };
@@ -108,7 +108,7 @@ router.put('/:Uid', checkApiKey, (req, res) => {
   xlsx.utils.book_append_sheet(newWorkbook, newSheet, 'Productos');
   xlsx.writeFile(newWorkbook, filePath);
   
-  res.status(200).json({ mensaje: 'Producto eliminado correctamente', Uid: req.params.Uid });
+  res.status(200).json({ mensaje: 'Producto actualizado correctamente', producto: productos[index] });
 
 });
 
