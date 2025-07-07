@@ -26,10 +26,25 @@ router.get('/', checkApiKey, (req, res) => {
   res.json(ordenes);
 });
 
+//BUSCAR -> BUSCAR UNA ORDEN
+router.get('/buscar', checkApiKey, (req, res) => {
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Archivo orden.xlsx no encontrado' });
+  }
+
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const ordenes = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  const query = req.query.query;
+  const result = ordenes.filter((ordenes) => ordenes.toLowerCase().includes(query.toLowerCase()));
+  
+  res.json(result);
+});
+
 //GET -> LEER ID DE UNA ORDEN
 router.get('/:Uid', checkApiKey, (req, res) => {
   if (!fs.existsSync(filePath)) {
-    return res.status(404).json({ error: 'Archivo producto.xlsx no encontrado' });
+    return res.status(404).json({ error: 'Archivo orden.xlsx no encontrado' });
   }
 
   const workbook = xlsx.readFile(filePath);
