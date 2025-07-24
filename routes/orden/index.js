@@ -35,8 +35,22 @@ router.get('/buscar', checkApiKey, (req, res) => {
   const workbook = xlsx.readFile(filePath);
   const sheetName = workbook.SheetNames[0];
   const ordenes = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
-  const query = req.query.query;
-  const result = ordenes.filter((ordenes) => ordenes.toLowerCase().includes(query.toLowerCase()));
+  const query = req.query.query?.toLowerCase();
+
+  if (!query) {
+    return res.status(400).json({ error: 'Debe proporcionar un parámetro de búsqueda con ?query=' });
+  }
+
+  // Filtra buscando coincidencia en campos de texto plano (strings)
+  const result = ordenes.filter((orden) => {
+    return Object.values(orden).some((value) => {
+      return (
+        typeof value === 'string' &&
+        value.toLowerCase().includes(query)
+      );
+    });
+  });
+
   
   res.json(result);
 });
